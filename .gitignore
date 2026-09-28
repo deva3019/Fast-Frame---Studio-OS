@@ -34,3 +34,5 @@ build/
 .env.test.local
 .env.production.local
 fast-frame-admin-ee5530695053.json
+.env.development
+.env.production
