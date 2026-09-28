@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>FastFrame Demo — Google Drive API Setup</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI",
+                         Roboto, Helvetica, Arial, sans-serif;
+            background: #f5f7fb;
+            color: #172033;
+            line-height: 1.6;
+        }
+
+        /* Header */
+        header {
+            background: linear-gradient(135deg, #111827, #1f2937);
+            color: white;
+            padding: 70px 20px 90px;
+            text-align: center;
+        }
+
+        .header-content {
+            max-width: 900px;
+            margin: auto;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 7px 14px;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 50px;
+            background: rgba(255,255,255,0.08);
+            font-size: 13px;
+            margin-bottom: 20px;
+        }
+
+        header h1 {
+            font-size: clamp(2.2rem, 5vw, 4rem);
+            line-height: 1.1;
+            margin-bottom: 20px;
+            letter-spacing: -1px;
+        }
+
+        header p {
+            max-width: 680px;
+            margin: auto;
+            color: #d1d5db;
+            font-size: 18px;
+        }
+
+        /* Navigation */
+        nav {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(255,255,255,0.94);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .nav-inner {
+            max-width: 1100px;
+            margin: auto;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            padding: 12px 20px;
+            overflow-x: auto;
+        }
+
+        nav a {
+            white-space: nowrap;
+            text-decoration: none;
+            color: #4b5563;
+            padding: 9px 15px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        nav a:hover {
+            background: #eef2ff;
+            color: #4f46e5;
+        }
+
+        /* Main */
+        main {
+            max-width: 1000px;
+            margin: 60px auto;
+            padding: 0 20px;
+        }
+
+        .intro {
+            text-align: center;
+            margin-bottom: 45px;
+        }
+
+        .intro h2 {
+            font-size: 30px;
+            margin-bottom: 10px;
+        }
+
+        .intro p {
+            color: #6b7280;
+        }
+
+        /* Step */
+        .step {
+            position: relative;
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 20px;
+            padding: 35px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
+        }
+
+        .step-header {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            margin-bottom: 25px;
+        }
+
+        .step-number {
+            width: 52px;
+            height: 52px;
+            min-width: 52px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #4f46e5;
+            color: white;
+            border-radius: 15px;
+            font-size: 21px;
+            font-weight: 800;
+        }
+
+        .step-header h2 {
+            font-size: 25px;
+            line-height: 1.2;
+        }
+
+        .step-description {
+            color: #6b7280;
+            margin-top: 4px;
+        }
+
+        /* Instructions */
+        .instructions {
+            list-style: none;
+            counter-reset: instruction;
+        }
+
+        .instructions li {
+            counter-increment: instruction;
+            position: relative;
+            padding: 16px 18px 16px 55px;
+            margin-bottom: 10px;
+            background: #f8fafc;
+            border-radius: 12px;
+            border: 1px solid #eef2f7;
+        }
+
+        .instructions li::before {
+            content: counter(instruction);
+            position: absolute;
+            left: 17px;
+            top: 15px;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background: #e0e7ff;
+            color: #4338ca;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+        strong {
+            color: #111827;
+        }
+
+        code {
+            background: #eef2ff;
+            color: #4338ca;
+            padding: 3px 7px;
+            border-radius: 6px;
+            font-family: Consolas, monospace;
+            font-size: 0.9em;
+        }
+
+        /* Links */
+        .cloud-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 20px;
+            padding: 11px 17px;
+            background: #4f46e5;
+            color: white;
+            text-decoration: none;
+            border-radius: 9px;
+            font-weight: 700;
+            transition: 0.2s ease;
+        }
+
+        .cloud-link:hover {
+            background: #4338ca;
+            transform: translateY(-1px);
+        }
+
+        /* Warning */
+        .warning {
+            margin-top: 25px;
+            padding: 18px 20px;
+            border-radius: 12px;
+            background: #fff7ed;
+            border: 1px solid #fed7aa;
+            color: #9a3412;
+        }
+
+        .warning strong {
+            color: #9a3412;
+        }
+
+        /* Completion */
+        .completion {
+            text-align: center;
+            background: linear-gradient(135deg, #eef2ff, #f5f3ff);
+            border: 1px solid #c7d2fe;
+            border-radius: 20px;
+            padding: 45px 25px;
+            margin-top: 45px;
+        }
+
+        .completion-icon {
+            width: 65px;
+            height: 65px;
+            margin: 0 auto 18px;
+            border-radius: 50%;
+            background: #4f46e5;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+        }
+
+        .completion h2 {
+            margin-bottom: 10px;
+        }
+
+        .completion p {
+            color: #5b6474;
+            max-width: 650px;
+            margin: auto;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 35px 20px;
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+        /* Mobile */
+        @media (max-width: 650px) {
+
+            header {
+                padding: 50px 18px 70px;
+            }
+
+            header p {
+                font-size: 16px;
+            }
+
+            main {
+                margin: 40px auto;
+                padding: 0 15px;
+            }
+
+            .step {
+                padding: 24px 18px;
+                border-radius: 16px;
+            }
+
+            .step-header {
+                align-items: flex-start;
+            }
+
+            .step-number {
+                width: 45px;
+                min-width: 45px;
+                height: 45px;
+                border-radius: 12px;
+            }
+
+            .step-header h2 {
+                font-size: 21px;
+            }
+
+            .instructions li {
+                padding-left: 48px;
+            }
+
+            .intro h2 {
+                font-size: 25px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Hero -->
+    <header>
+        <div class="header-content">
+
+            <div class="badge">
+                FastFrame Demo Setup Guide
+            </div>
+
+            <h1>Google Drive API Setup</h1>
+
+            <p>
+                Follow this step-by-step guide to create a Google Cloud project,
+                enable the Google Drive API, create a service account, and generate
+                the JSON credentials required for your application.
+            </p>
+
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav>
+        <div class="nav-inner">
+            <a href="#step1">Step 1</a>
+            <a href="#step2">Step 2</a>
+            <a href="#step3">Step 3</a>
+        </div>
+    </nav>
+
+    <main>
+
+        <section class="intro">
+            <h2>Setup Instructions</h2>
+            <p>
+                Complete each step in order. The entire process only requires a
+                Google Cloud project and a Google account.
+            </p>
+        </section>
+
+
+        <!-- STEP 1 -->
+        <section class="step" id="step1">
+
+            <div class="step-header">
+
+                <div class="step-number">
+                    1
+                </div>
+
+                <div>
+                    <h2>Create a Google Cloud Project & Enable the API</h2>
+                    <p class="step-description">
+                        Create the project that will contain your Google Drive API configuration.
+                    </p>
+                </div>
+
+            </div>
+
+            <ol class="instructions">
+
+                <li>
+                    Log in to the
+                    <strong>Google Cloud Console</strong>
+                    using your new testing email.
+                </li>
+
+                <li>
+                    Accept the Google Cloud
+                    <strong>Terms of Service</strong>
+                    if prompted.
+                </li>
+
+                <li>
+                    In the top-left project dropdown, next to the Google Cloud logo,
+                    click <strong>New Project</strong>.
+                </li>
+
+                <li>
+                    Enter a project name such as
+                    <code>FastFrame Demo</code>
+                    and click <strong>Create</strong>.
+                </li>
+
+                <li>
+                    Once the project is created, make sure the new project is
+                    selected in the top project dropdown.
+                </li>
+
+                <li>
+                    Open the left sidebar and go to:
+                    <strong>APIs &amp; Services → Library</strong>.
+                </li>
+
+                <li>
+                    Search for
+                    <strong>Google Drive API</strong>.
+                </li>
+
+                <li>
+                    Open the Google Drive API page and click the blue
+                    <strong>Enable</strong>
+                    button.
+                </li>
+
+            </ol>
+
+            <a
+                class="cloud-link"
+                href="https://console.cloud.google.com/"
+                target="_blank"
+                rel="noopener noreferrer"
+            >
+                Open Google Cloud Console ↗
+            </a>
+
+        </section>
+
+
+        <!-- STEP 2 -->
+        <section class="step" id="step2">
+
+            <div class="step-header">
+
+                <div class="step-number">
+                    2
+                </div>
+
+                <div>
+                    <h2>Create the Service Account</h2>
+                    <p class="step-description">
+                        Create the service account that will act as the application's bot.
+                    </p>
+                </div>
+
+            </div>
+
+            <ol class="instructions">
+
+                <li>
+                    In Google Cloud Console, open the left sidebar and navigate to:
+                    <strong>APIs &amp; Services → Credentials</strong>.
+                </li>
+
+                <li>
+                    Click the
+                    <strong>+ CREATE CREDENTIALS</strong>
+                    button at the top.
+                </li>
+
+                <li>
+                    Select
+                    <strong>Service Account</strong>.
+                </li>
+
+                <li>
+                    Under <strong>Service account details</strong>,
+                    enter a name such as
+                    <code>studio-bot</code>.
+                </li>
+
+                <li>
+                    Click
+                    <strong>Create and Continue</strong>.
+                </li>
+
+                <li>
+                    Under <strong>Grant this service account access</strong>,
+                    you can skip this step and click
+                    <strong>Continue</strong>.
+                </li>
+
+                <li>
+                    Under <strong>Grant users access</strong>,
+                    skip this step and click
+                    <strong>Done</strong>.
+                </li>
+
+            </ol>
+
+        </section>
+
+
+        <!-- STEP 3 -->
+        <section class="step" id="step3">
+
+            <div class="step-header">
+
+                <div class="step-number">
+                    3
+                </div>
+
+                <div>
+                    <h2>Generate and Download the JSON Key</h2>
+                    <p class="step-description">
+                        Create a private JSON key for the service account.
+                    </p>
+                </div>
+
+            </div>
+
+            <ol class="instructions">
+
+                <li>
+                    You will now see your newly created service account listed
+                    under <strong>Service Accounts</strong>.
+                </li>
+
+                <li>
+                    The service account will have an email address similar to:
+                    <br><br>
+                    <code>
+                        studio-bot@fastframe-demo-123.iam.gserviceaccount.com
+                    </code>
+                </li>
+
+                <li>
+                    Click the <strong>pencil/edit icon</strong> next to the
+                    service account, or click the service account email address.
+                </li>
+
+                <li>
+                    Open the
+                    <strong>Keys</strong>
+                    tab.
+                </li>
+
+                <li>
+                    Click
+                    <strong>Add Key → Create new key</strong>.
+                </li>
+
+                <li>
+                    Select
+                    <strong>JSON</strong>
+                    as the key type.
+                </li>
+
+                <li>
+                    Click
+                    <strong>Create</strong>.
+                </li>
+
+                <li>
+                    A file named
+                    <code>credentials.json</code>
+                    will be downloaded to your computer.
+                </li>
+
+            </ol>
+
+            <div class="warning">
+                <strong>⚠️ Important:</strong><br>
+                The <code>credentials.json</code> file contains a private
+                service-account key. Do not upload it to GitHub, publish it
+                publicly, or share it with unauthorized people.
+            </div>
+
+        </section>
+
+
+        <!-- Completion -->
+        <section class="completion">
+
+            <div class="completion-icon">
+                ✓
+            </div>
+
+            <h2>Setup Complete</h2>
+
+            <p>
+                Once you have successfully downloaded
+                <code>credentials.json</code>, the Google Cloud service account
+                setup is complete. You can now use the credentials with your
+                application to authenticate with Google Drive.
+            </p>
+
+        </section>
+
+    </main>
+
+
+    <footer>
+        <p>
+            FastFrame Demo • Google Drive API Setup Guide
+        </p>
+    </footer>
+
+</body>
+</html>

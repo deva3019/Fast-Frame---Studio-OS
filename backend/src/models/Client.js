@@ -6,6 +6,5 @@ const clientSchema = new mongoose.Schema({
     phone: { type: String },
     notes: { type: String }
 }, { timestamps: true }); 
-// timestamps automatically adds createdAt and updatedAt!
 
 module.exports = mongoose.model('Client', clientSchema);

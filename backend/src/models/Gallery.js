@@ -1,19 +1,18 @@
-const mongoose = require('mongoose');
+const express = require('express');
+const router = express.Router();
+const { 
+    getPublicGallery, 
+    getGalleryImages, 
+    saveSelections, 
+    getSyncStatus,
+    syncShortcuts 
+} = require('../controllers/galleryController');
 
-const gallerySchema = new mongoose.Schema({
-    event: { 
-        type: mongoose.Schema.Types.ObjectId, 
-        ref: 'Event', 
-        required: true 
-    },
-    driveFolderId: { type: String, required: true },
-    // Array of Google Drive File IDs that the client selects
-    selectedPhotos: [{ type: String }],
-    status: {
-        type: String,
-        enum: ['Pending Selection', 'Selection Complete', 'Delivered'],
-        default: 'Pending Selection'
-    }
-}, { timestamps: true });
+router.get('/public/:eventId', getPublicGallery);
+router.get('/folder/:folderId/images', getGalleryImages);
+router.post('/:eventId/selections', saveSelections);
 
-module.exports = mongoose.model('Gallery', gallerySchema);
+router.get('/:eventId/sync-status', getSyncStatus);
+router.post('/:eventId/sync-shortcuts', syncShortcuts);
+
+module.exports = router;

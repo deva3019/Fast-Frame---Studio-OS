@@ -11,7 +11,7 @@ node_modules
 dist
 dist-ssr
 *.local
-
+fast-frame-admin-ee5530695053.json
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

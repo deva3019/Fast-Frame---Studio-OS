@@ -1,13 +1,24 @@
 const express = require('express');
 const router = express.Router();
-const { createGallery, updateSelection, getGalleries } = require('../controllers/galleryController');
+const { 
+    getPublicGallery, 
+    getGalleryImages, 
+    saveSelections, 
+    getSyncStatus,
+    syncShortcuts,
+    getConfig 
+} = require('../controllers/galleryController');
 
-router.route('/')
-    .post(createGallery)
-    .get(getGalleries);
+// 1. Fetch Backend Config (Service Email)
+router.get('/config', getConfig);
 
-// PUT request to update the selection for a specific gallery ID
-router.route('/:id/select')
-    .put(updateSelection);
+// 2. Public Client Routes
+router.get('/public/:eventId', getPublicGallery);
+router.get('/folder/:folderId/images', getGalleryImages);
+router.post('/:eventId/selections', saveSelections);
+
+// 3. Telemetry & Synchronization (Restructured to prevent 404 collisions)
+router.get('/sync/status/:eventId', getSyncStatus);
+router.post('/sync/execute/:eventId', syncShortcuts);
 
 module.exports = router;

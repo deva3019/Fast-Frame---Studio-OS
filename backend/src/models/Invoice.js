@@ -1,32 +1,24 @@
 const mongoose = require('mongoose');
 
-const lineItemSchema = new mongoose.Schema({
+const invoiceItemSchema = new mongoose.Schema({
     description: { type: String, required: true },
-    quantity: { type: Number, required: true, default: 1 },
-    price: { type: Number, required: true }
+    amount: { type: Number, required: true, min: 0 }
 });
 
 const invoiceSchema = new mongoose.Schema({
-    client: { type: mongoose.Schema.Types.ObjectId, ref: 'Client', required: true },
-    event: { type: mongoose.Schema.Types.ObjectId, ref: 'Event' }, // Optional: link to specific shoot
     invoiceNumber: { type: String, required: true, unique: true },
+    event: { type: mongoose.Schema.Types.ObjectId, ref: 'Event', required: true },
     issueDate: { type: Date, default: Date.now },
-    dueDate: { type: Date, required: true },
-    
-    // Array of services/products
-    items: [lineItemSchema],
-    
-    // Calculations
-    subtotal: { type: Number, required: true },
-    tax: { type: Number, default: 0 },
-    total: { type: Number, required: true },
-    
-    status: {
-        type: String,
-        enum: ['Draft', 'Sent', 'Paid', 'Overdue'],
-        default: 'Draft'
+    dueDate: { type: Date },
+    items: [invoiceItemSchema],
+    discount: { type: Number, default: 0, min: 0 },
+    advancePaid: { type: Number, default: 0, min: 0 },
+    status: { 
+        type: String, 
+        enum: ['Draft', 'Unpaid', 'Partially Paid', 'Paid'], 
+        default: 'Draft' 
     },
-    notes: { type: String }
+    notes: { type: String, default: '' }
 }, { timestamps: true });
 
 module.exports = mongoose.model('Invoice', invoiceSchema);
